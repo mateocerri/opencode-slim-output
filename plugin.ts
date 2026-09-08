@@ -14,7 +14,7 @@ const COVERED_TOOLS = new Set(["bash", "grep", "glob", "read"]);
 // tool name, output.output is the string result and output.args holds params.
 // Shapes vary across versions, so everything below is defensive: any doubt
 // means passthrough (fail-closed).
-export const SlimOutputPlugin = (async (ctx, opts?: SlimPluginOptions) => {
+export const SlimOutputPlugin = (async (ctx: unknown, opts?: SlimPluginOptions) => {
   const directory = (ctx as unknown as { directory?: string }).directory ?? "";
   const enabled = opts?.enabled ?? true;
 
