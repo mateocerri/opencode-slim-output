@@ -1,0 +1,16 @@
+{
+  "name": "opencode-slim-output",
+  "version": "0.1.0",
+  "description": "OpenCode plugin: fail-closed post-processor that collapses external stack frames, relativizes paths and dedups repetitive output.",
+  "type": "module",
+  "main": "plugin.ts",
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@opencode-ai/plugin": "latest",
+    "typescript": "^5.6.0"
+  },
+  "license": "MIT"
+}
