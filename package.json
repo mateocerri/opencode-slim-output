@@ -1,5 +1,5 @@
 {
-  "name": "opencode-slim-output",
+  "name": "opencode-slim-trace",
   "version": "0.1.0",
   "description": "OpenCode plugin: fail-closed post-processor that collapses external stack frames, relativizes paths and dedups repetitive output.",
   "type": "module",
