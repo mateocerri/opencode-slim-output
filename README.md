@@ -79,7 +79,7 @@ opencode after changing them.
 ## Develop
 
 ```sh
-bun install
+npm install
 bun test        # 14 tests, incl. adversarial prose fixtures and hook wiring
 bun run typecheck
 ```
