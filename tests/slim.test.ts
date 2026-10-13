@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test";
-import { collapseStacks, dedupConsecutive, relativizePaths, slimOutput } from "../src/slim";
+import { describe, test } from "node:test";
+import assert from "node:assert/strict";
+import { collapseStacks, dedupConsecutive, relativizePaths, slimOutput } from "../src/slim.ts";
 
 const CWD = "/home/mateo/proj";
 
@@ -19,16 +20,16 @@ ConnectionError: boom`;
 describe("python traceback", () => {
   test("collapses external frames, keeps project + error", () => {
     const out = slimOutput(PY_TRACE, { cwd: CWD, command: "pytest" });
-    expect(out).toContain("ConnectionError: boom");
-    expect(out).toContain("./app/main.py");
-    expect(out).toContain("./app/service.py");
-    expect(out).toContain("external frames omitted");
-    expect(out).not.toContain("urllib3/connection.py");
-    expect(out).not.toContain("/home/mateo/proj/app/main.py");
+    assert.ok(out.includes("ConnectionError: boom"));
+    assert.ok(out.includes("./app/main.py"));
+    assert.ok(out.includes("./app/service.py"));
+    assert.ok(out.includes("external frames omitted"));
+    assert.ok(!out.includes("urllib3/connection.py"));
+    assert.ok(!out.includes("/home/mateo/proj/app/main.py"));
   });
   test("without anchor, frames untouched", () => {
     const noAnchor = `  File "/x/a.py", line 1, in f\n  File "/x/b.py", line 2, in g`;
-    expect(slimOutput(noAnchor, { command: "echo hi" })).toBe(noAnchor);
+    assert.equal(slimOutput(noAnchor, { command: "echo hi" }), noAnchor);
   });
 });
 
@@ -42,11 +43,11 @@ const DOTNET_STACK = `System.NullReferenceException: boom
 describe("dotnet stack", () => {
   test("collapses System/Microsoft frames", () => {
     const out = slimOutput(DOTNET_STACK, { cwd: CWD, command: "dotnet test" });
-    expect(out).toContain("NullReferenceException: boom");
-    expect(out).toContain("MyApp.Service.Handle()");
-    expect(out).toContain("MyApp.Program.Main()");
-    expect(out).toContain("external frames omitted");
-    expect(out).not.toContain("TaskAwaiter");
+    assert.ok(out.includes("NullReferenceException: boom"));
+    assert.ok(out.includes("MyApp.Service.Handle()"));
+    assert.ok(out.includes("MyApp.Program.Main()"));
+    assert.ok(out.includes("external frames omitted"));
+    assert.ok(!out.includes("TaskAwaiter"));
   });
 });
 
@@ -64,42 +65,42 @@ Test Suites: 1 failed, 1 total`;
 describe("jest stack", () => {
   test("collapses node internals, keeps assertion", () => {
     const out = slimOutput(JEST_STACK, { command: "jest" });
-    expect(out).toContain("Expected: 4");
-    expect(out).toContain("at Object.<anonymous> (src/main.test.js:6:29)");
-    expect(out).toContain("external frames omitted");
-    expect(out).not.toContain("task_queues");
+    assert.ok(out.includes("Expected: 4"));
+    assert.ok(out.includes("at Object.<anonymous> (src/main.test.js:6:29)"));
+    assert.ok(out.includes("external frames omitted"));
+    assert.ok(!out.includes("task_queues"));
   });
 });
 
 describe("adversarial prose", () => {
   test("novel text untouched", () => {
     const prose = `We met at noon near the old mill.\nSee file x for details.\nThe dll of the system hummed softly.`;
-    expect(slimOutput(prose, { command: "cat novel.txt" })).toBe(prose);
+    assert.equal(slimOutput(prose, { command: "cat novel.txt" }), prose);
   });
   test("diff with paths but no anchor untouched", () => {
     const diff = `--- a/src/a.ts\n+++ b/src/b.ts\n@@ -1 +1 @@\n-old\n+new`;
-    expect(slimOutput(diff, { command: "git diff" })).toBe(diff);
+    assert.equal(slimOutput(diff, { command: "git diff" }), diff);
   });
 });
 
 describe("paths and repetition", () => {
   test("relativizes cwd prefix", () => {
     const out = relativizePaths(`${CWD}/a.ts\n${CWD}/b.ts`, CWD);
-    expect(out).toBe("./a.ts\n./b.ts");
+    assert.equal(out, "./a.ts\n./b.ts");
   });
   test("dedups consecutive repeats", () => {
-    expect(dedupConsecutive(["ok", "ok", "ok", "done"])).toEqual(["ok (x3)", "done"]);
+    assert.deepEqual(dedupConsecutive(["ok", "ok", "ok", "done"]), ["ok (x3)", "done"]);
   });
   test("long find output truncated with marker", () => {
     const big = Array.from({ length: 300 }, (_, i) => `${CWD}/f${i}.ts`).join("\n");
     const out = slimOutput(big, { cwd: CWD, command: "find . -type f" });
-    expect(out).toContain("./f0.ts");
-    expect(out).toContain("truncated by slim-output");
-    expect(out.split("\n").length).toBeLessThan(150);
+    assert.ok(out.includes("./f0.ts"));
+    assert.ok(out.includes("truncated by slim-output"));
+    assert.ok(out.split("\n").length < 150);
   });
   test("empty and tiny outputs passthrough", () => {
-    expect(slimOutput("", {})).toBe("");
-    expect(slimOutput("ok", { command: "go test" })).toBe("ok");
+    assert.equal(slimOutput("", {}), "");
+    assert.equal(slimOutput("ok", { command: "go test" }), "ok");
   });
 });
 
@@ -111,7 +112,7 @@ describe("collapseStacks unit", () => {
       "ValueError: x",
     ];
     const { lines: out, collapsed } = collapseStacks(lines, { command: "python x.py" });
-    expect(collapsed).toBe(0);
-    expect(out).toEqual(lines);
+    assert.equal(collapsed, 0);
+    assert.deepEqual(out, lines);
   });
 });

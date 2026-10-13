@@ -1,5 +1,6 @@
-import { describe, expect, test } from "bun:test";
-import definition from "../plugin";
+import { describe, test } from "node:test";
+import assert from "node:assert/strict";
+import definition from "../plugin.ts";
 
 const CWD = "/home/mateo/proj";
 
@@ -35,9 +36,9 @@ describe("execute.after wiring (v2 result shape)", () => {
     };
     await after(event);
     const out = (event.result as { content: string }).content;
-    expect(out).toContain("ValueError: boom");
-    expect(out).toContain("frames omitted");
-    expect(out).not.toContain("mod0.py");
+    assert.ok(out.includes("ValueError: boom"));
+    assert.ok(out.includes("frames omitted"));
+    assert.ok(!out.includes("mod0.py"));
   });
 
   test("slims text parts, leaves other parts alone", async () => {
@@ -50,15 +51,15 @@ describe("execute.after wiring (v2 result shape)", () => {
     };
     await after(event);
     const content = (event.result as { content: Array<Record<string, unknown>> }).content;
-    expect(content[0].text).toContain("frames omitted");
-    expect(content[1]).toEqual({ type: "image", data: "abc" });
+    assert.ok((content[0].text as string).includes("frames omitted"));
+    assert.deepEqual(content[1], { type: "image", data: "abc" });
   });
 
   test("unknown shapes pass through untouched", async () => {
     const after = await afterHook();
     const legacy = { tool: "shell", input: { command: "pytest" }, result: trace(8) };
     await after(legacy);
-    expect(legacy.result).toContain("mod0.py");
+    assert.ok(legacy.result.includes("mod0.py"));
     const noResult = { tool: "shell", input: { command: "pytest" } };
     await after(noResult);
     const otherTool = {
@@ -68,6 +69,6 @@ describe("execute.after wiring (v2 result shape)", () => {
       result: { content: trace(8) },
     };
     await after(otherTool);
-    expect((otherTool.result as { content: string }).content).toContain("mod0.py");
+    assert.ok((otherTool.result as { content: string }).content.includes("mod0.py"));
   });
 });

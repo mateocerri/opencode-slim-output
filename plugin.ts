@@ -1,5 +1,5 @@
 import { Plugin } from "@opencode/plugin";
-import { slimOutput } from "./src/slim";
+import { slimOutput } from "./src/slim.ts";
 
 interface SlimPluginOptions {
   maxLines?: number;
