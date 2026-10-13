@@ -1,15 +1,23 @@
 {
-  "name": "opencode-slim-trace",
+  "name": "opencode-slim-output",
   "version": "0.1.0",
   "description": "OpenCode plugin: fail-closed post-processor that collapses external stack frames, relativizes paths and dedups repetitive output.",
   "type": "module",
   "main": "plugin.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mateocerri/opencode-slim-output.git"
+  },
+  "homepage": "https://www.npmjs.com/package/opencode-slim-output",
+  "author": "Mateo Cerri",
+  "keywords": ["opencode", "opencode-plugin", "output", "stack-trace", "wsl"],
+  "files": ["plugin.ts", "src", "README.md", "LICENSE"],
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@opencode-ai/plugin": "latest",
+    "@opencode/plugin": "latest",
     "bun-types": "^1.4.2",
     "typescript": "^5.6.0"
   },
