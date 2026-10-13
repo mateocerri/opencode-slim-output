@@ -6,7 +6,7 @@
   "main": "plugin.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mateocerri/opencode-slim-output.git"
+    "url": "git+https://github.com/mateocerri/opencode-slim-output.git"
   },
   "homepage": "https://www.npmjs.com/package/opencode-slim-output",
   "author": "Mateo Cerri",
